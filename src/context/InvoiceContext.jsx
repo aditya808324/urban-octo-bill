@@ -1,0 +1,46 @@
+import { createContext, useContext, useState, useEffect } from 'react';
+
+const InvoiceContext = createContext();
+
+export const useInvoices = () => {
+    const context = useContext(InvoiceContext);
+    if (!context) throw new Error('useInvoices must be used within an InvoiceProvider');
+    return context;
+};
+
+export const InvoiceProvider = ({ children }) => {
+    const [invoices, setInvoices] = useState(() => {
+        const saved = localStorage.getItem('invoices');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem('invoices', JSON.stringify(invoices));
+    }, [invoices]);
+
+    const addInvoice = (invoice) => {
+        setInvoices(prev => [invoice, ...prev]);
+    };
+
+    const getStats = () => {
+        const totalRevenue = invoices.reduce((acc, inv) => acc + inv.total, 0);
+        const totalInvoices = invoices.length;
+
+        // Get sales for today (IST)
+        const today = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+        const todaySales = invoices
+            .filter(inv => {
+                const invDate = new Date(inv.date).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+                return invDate === today;
+            })
+            .reduce((acc, inv) => acc + inv.total, 0);
+
+        return { totalRevenue, totalInvoices, todaySales };
+    };
+
+    return (
+        <InvoiceContext.Provider value={{ invoices, addInvoice, getStats }}>
+            {children}
+        </InvoiceContext.Provider>
+    );
+};
