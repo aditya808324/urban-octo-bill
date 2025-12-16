@@ -18,8 +18,21 @@ export const InvoiceProvider = ({ children }) => {
         localStorage.setItem('invoices', JSON.stringify(invoices));
     }, [invoices]);
 
-    const addInvoice = (invoice) => {
+    const addInvoice = async (invoice) => {
+        // Optimistic UI update
         setInvoices(prev => [invoice, ...prev]);
+
+        try {
+            const res = await fetch('/api/bills', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(invoice)
+            });
+            if (!res.ok) throw new Error('Failed to save to DB');
+        } catch (error) {
+            console.error('Error saving invoice:', error);
+            // In a real app, show error toast
+        }
     };
 
     const getStats = () => {

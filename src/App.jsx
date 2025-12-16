@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutDashboard, ShoppingCart, Package } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, History } from 'lucide-react';
 import './index.css';
 
 // Components (We will move these to separate files shortly)
@@ -7,6 +7,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
     { id: 'billing', icon: ShoppingCart, label: 'Billing' },
     { id: 'products', icon: Package, label: 'Products' },
+    { id: 'history', icon: History, label: 'History' },
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   ];
 
@@ -64,6 +65,7 @@ import { InvoiceProvider } from './context/InvoiceContext';
 import ProductManager from './components/ProductManager';
 import BillingInterface from './components/BillingInterface';
 import Dashboard from './components/Dashboard';
+import BillHistory from './components/BillHistory';
 
 function App() {
   const [activeTab, setActiveTab] = useState('billing');
@@ -95,6 +97,8 @@ const MainContent = ({ activeTab }) => {
         <ProductManager />
       ) : activeTab === 'billing' ? (
         <BillingInterface />
+      ) : activeTab === 'history' ? (
+        <BillHistory />
       ) : (
         <Dashboard />
       )}
